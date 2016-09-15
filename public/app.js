@@ -1,30 +1,37 @@
 import React from 'react';
 
 const App = React.createClass({
-    onButtonClick(e) {
-        const btn = e.target;
-        console.log(`The user clicked ${btn.name}: ${btn.value}`);
+    getInitialState() {
+        return { names: [] };
+    },
+
+    onFormSubmit(e) {
+        const name = this.refs.name.value;
+        const names = [ ...this.state.names, name ]
+        this.setState({ names: names });
+        this.refs.name.value = '';
+        e.preventDefault();
     },
 
     render: function() {
         return (
             <div>
-                <h1>Do you like Arsenal?!</h1>
+                <h1>Sign Up</h1>
 
-                <button
-                    name='button-1'
-                    value='yes'
-                    onClick={this.onButtonClick}
-                >
-                    Yes!
-                </button>
-                <button
-                    name='button-2'
-                    value='no'
-                    onClick={this.onButtonClick}
-                >
-                    No!
-                </button>
+                <form onSubmit={this.onFormSubmit}>
+                    <input
+                        placeholder='Name'
+                        ref='name'
+                    >
+                    </input>
+                    <input type='submit' />
+                </form>
+                <div>
+                    <h3>Names</h3>
+                    <ul>
+                        { this.state.names.map((name, i) => <li key={i}>{name}</li>) }
+                    </ul>
+                </div>
             </div>
         );
     },
