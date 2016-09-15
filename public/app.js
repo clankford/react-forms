@@ -1,6 +1,13 @@
 import React from 'react';
 
 const App = React.createClass({
+    onYesClick(e) {
+        console.log('The user clicked button-1: yes', e);
+    },
+
+    onNoClick(e) {
+        console.log('The user clicked button-2: no', e);
+    },
     render: function() {
         return (
             <div>
