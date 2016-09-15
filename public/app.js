@@ -1,13 +1,11 @@
 import React from 'react';
 
 const App = React.createClass({
-    onYesClick(e) {
-        console.log('The user clicked button-1: yes', e);
+    onButtonClick(e) {
+        const btn = e.target;
+        console.log(`The user clicked ${btn.name}: ${btn.value}`);
     },
 
-    onNoClick(e) {
-        console.log('The user clicked button-2: no', e);
-    },
     render: function() {
         return (
             <div>
@@ -16,14 +14,14 @@ const App = React.createClass({
                 <button
                     name='button-1'
                     value='yes'
-                    onClick={this.onYesClick}
+                    onClick={this.onButtonClick}
                 >
                     Yes!
                 </button>
                 <button
                     name='button-2'
                     value='no'
-                    onClick={this.onNoClick}
+                    onClick={this.onButtonClick}
                 >
                     No!
                 </button>
