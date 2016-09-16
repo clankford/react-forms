@@ -2,15 +2,20 @@ import React from 'react';
 
 const App = React.createClass({
     getInitialState() {
-        return { names: [] };
+        return {
+            name: '',
+            names: [],
+        };
     },
 
     onFormSubmit(e) {
-        const name = this.refs.name.value;
-        const names = [ ...this.state.names, name ]
-        this.setState({ names: names });
-        this.refs.name.value = '';
+        const names = [ ...this.state.names, this.state.name ]
+        this.setState({ names: names, name: '' });
         e.preventDefault();
+    },
+
+    onNameChange(e) {
+        this.setState({ name: e.target.value });
     },
 
     render: function() {
@@ -21,9 +26,11 @@ const App = React.createClass({
                 <form onSubmit={this.onFormSubmit}>
                     <input
                         placeholder='Name'
-                        ref='name'
+                        value={this.state.name}
+                        onChange={this.onNameChange}
                     >
                     </input>
+
                     <input type='submit' />
                 </form>
                 <div>
