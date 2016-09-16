@@ -4,17 +4,22 @@ const App = React.createClass({
     getInitialState() {
         return {
             fields: {},
+            fieldErrors: {},
             people: [],
         };
     },
 
     onFormSubmit(e) {
-        const people = [
-            ...this.state.people,
-            this.state.fields,
-        ];
-        this.setState({ people, fields: {} });
+        const people = [ ...this.state.people ];
+        const person = this.state.fields;
+        const fieldErrors = this.validate(person);
+        this.setState({ fieldErrors });
         e.preventDefault();
+
+        if (Object.keys(fieldErrors).length) return;
+
+        people.push(person);
+        this.setState({ people, fields: {} });
     },
 
     onInputChange(e) {
@@ -23,27 +28,37 @@ const App = React.createClass({
         this.setState({ fields });
     },
 
+    validate(person) {
+        return {};
+    },
+
     render: function() {
         return (
             <div>
                 <h1>Sign Up</h1>
 
                 <form onSubmit={this.onFormSubmit}>
+
                     <input
                         placeholder='Name'
                         name='name'
+                        // https://github.com/erikras/redux-form/issues/735
                         value={this.state.fields.name || ''}
                         onChange={this.onInputChange}
-                    >
-                    </input>
+                    />
+
+                    <span style={{ color: 'red' }}>{ this.state.fieldErrors.name }</span>
+
+                    <br />
 
                     <input
                         placeholder='Email'
                         name='email'
                         value={this.state.fields.email || ''}
                         onChange={this.onInputChange}
-                    >
-                    </input>
+                    />
+
+                    <span style={{ color: 'red' }}>{ this.state.fieldErrors.email }</span>
 
                     <input type='submit' />
                 </form>
