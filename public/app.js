@@ -3,19 +3,24 @@ import React from 'react';
 const App = React.createClass({
     getInitialState() {
         return {
-            name: '',
-            names: [],
+            fields: {},
+            people: [],
         };
     },
 
     onFormSubmit(e) {
-        const names = [ ...this.state.names, this.state.name ]
-        this.setState({ names: names, name: '' });
+        const people = [
+            ...this.state.people,
+            this.state.fields,
+        ];
+        this.setState({ people, fields: {} });
         e.preventDefault();
     },
 
-    onNameChange(e) {
-        this.setState({ name: e.target.value });
+    onInputChange(e) {
+        const fields = this.state.fields;
+        fields[e.target.name] = e.target.value;
+        this.setState({ fields });
     },
 
     render: function() {
@@ -26,8 +31,17 @@ const App = React.createClass({
                 <form onSubmit={this.onFormSubmit}>
                     <input
                         placeholder='Name'
-                        value={this.state.name}
-                        onChange={this.onNameChange}
+                        name='name'
+                        value={this.state.fields.name || ''}
+                        onChange={this.onInputChange}
+                    >
+                    </input>
+
+                    <input
+                        placeholder='Email'
+                        name='email'
+                        value={this.state.fields.email || ''}
+                        onChange={this.onInputChange}
                     >
                     </input>
 
@@ -36,7 +50,9 @@ const App = React.createClass({
                 <div>
                     <h3>Names</h3>
                     <ul>
-                        { this.state.names.map((name, i) => <li key={i}>{name}</li>) }
+                        { this.state.people.map(({ name, email }, i) =>
+                            <li key={i}>{name} ({ email })</li>
+                        ) }
                     </ul>
                 </div>
             </div>
