@@ -1,4 +1,5 @@
 import React from 'react';
+import isEmail from 'validator/lib/isEmail';
 
 const App = React.createClass({
     getInitialState() {
@@ -29,7 +30,11 @@ const App = React.createClass({
     },
 
     validate(person) {
-        return {};
+        const errors = {};
+        if (!person.name) errors.name = 'Name Required';
+        if (!person.email) errors.email = 'Email Required';
+        if (person.email && !isEmail(person.email)) errors.email = 'Invalid Email';
+        return errors;
     },
 
     render: function() {
