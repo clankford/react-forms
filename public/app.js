@@ -1,6 +1,7 @@
 import React from 'react';
 import isEmail from 'validator/lib/isEmail';
 import Field from './FieldComponent';
+import CourseSelect from './CourseSelectComponent';
 
 const App = React.createClass({
     getInitialState() {
