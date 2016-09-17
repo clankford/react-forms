@@ -1,5 +1,6 @@
 import React from 'react';
 import isEmail from 'validator/lib/isEmail';
+import Field from './FieldComponent';
 
 const App = React.createClass({
     getInitialState() {
@@ -11,30 +12,37 @@ const App = React.createClass({
     },
 
     onFormSubmit(e) {
-        const people = [ ...this.state.people ];
+        const people = this.state.people;
         const person = this.state.fields;
-        const fieldErrors = this.validate(person);
-        this.setState({ fieldErrors });
+
         e.preventDefault();
 
-        if (Object.keys(fieldErrors).length) return;
+        if (this.validate()) return;
 
         people.push(person);
         this.setState({ people, fields: {} });
     },
 
-    onInputChange(e) {
+    onInputChange({ name, value, error }) {
         const fields = this.state.fields;
-        fields[e.target.name] = e.target.value;
-        this.setState({ fields });
+        const fieldErrors = this.state.fieldErrors;
+
+        fields[name] = value;
+        fieldErrors[name] = error;
+
+        this.setState({ fields, fieldErrors });
     },
 
-    validate(person) {
-        const errors = {};
-        if (!person.name) errors.name = 'Name Required';
-        if (!person.email) errors.email = 'Email Required';
-        if (person.email && !isEmail(person.email)) errors.email = 'Invalid Email';
-        return errors;
+    validate() {
+        const person = this.state.fields;
+        const fieldErrors = this.state.fieldErrors;
+        const errorMessages = Object.keys(fieldErrors).filter((k) => fieldErrors[k]);
+
+        if (!person.name) return true;
+        if (!person.email) return true;
+        if (errorMessages.length) return true;
+
+        return false;
     },
 
     render: function() {
@@ -44,29 +52,28 @@ const App = React.createClass({
 
                 <form onSubmit={this.onFormSubmit}>
 
-                    <input
+                    <Field
                         placeholder='Name'
                         name='name'
                         // https://github.com/erikras/redux-form/issues/735
-                        value={this.state.fields.name || ''}
+                        value={this.state.fields.name || '' }
                         onChange={this.onInputChange}
+                        validate={(val) => (val ? false : 'Name Required')}
                     />
-
-                    <span style={{ color: 'red' }}>{ this.state.fieldErrors.name }</span>
 
                     <br />
 
-                    <input
+                    <Field
                         placeholder='Email'
                         name='email'
                         value={this.state.fields.email || ''}
                         onChange={this.onInputChange}
+                        validate={(val) => (isEmail(val) ? false : 'Invalid Email')}
                     />
 
-                    <span style={{ color: 'red' }}>{ this.state.fieldErrors.email }</span>
-
-                    <input type='submit' />
+                    <input type='submit' disabled={this.validate()} />
                 </form>
+
                 <div>
                     <h3>Names</h3>
                     <ul>

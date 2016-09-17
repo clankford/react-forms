@@ -16,8 +16,18 @@ module.exports = React.createClass({
         };
     },
 
-    componentWilReceiveProps(update) {
+    componentWillReceiveProps(update) {
         this.setState({ value: update.value });
+    },
+
+    onChange(e) {
+        const name = this.props.name;
+        const value = e.target.value;
+        const error = this.props.validate ? this.props.validate(value) : false;
+
+        this.setState({value, error});
+
+        this.props.onChange({name, value, error});
     },
 
     render() {
