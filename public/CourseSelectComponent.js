@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
-import Core from './core';
-import Electives from './electives'
+import Core from './core.json';
+import Electives from './electives.json'
 
 const Courses = {
     core: Core,
@@ -16,7 +16,7 @@ module.exports = React.createClass({
 
     getInitialState() {
         return {
-            depatment: null,
+            department: null,
             course: null,
             courses: [],
             _loading: false,
@@ -72,10 +72,10 @@ module.exports = React.createClass({
                 <option value=''>
                     Which department?
                 </option>
-                <option value='core'>
+                <option value='Core'>
                     Physics: Core
                 </option>
-                <option value='electives'>
+                <option value='Electives'>
                     Physics: Electives
                 </option>
             </select>
@@ -112,7 +112,7 @@ module.exports = React.createClass({
 function apiClient(department) {
     return {
         then: function(cb) {
-            setTimeout(() => { cb(Courses[department]); }, 1000);
+            setTimeout(() => { cb(Courses[department.toLowerCase()]); }, 1000);
         },
     };
 }

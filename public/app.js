@@ -39,8 +39,11 @@ const App = React.createClass({
         const fieldErrors = this.state.fieldErrors;
         const errorMessages = Object.keys(fieldErrors).filter((k) => fieldErrors[k]);
 
+        // Form Level Validation
         if (!person.name) return true;
         if (!person.email) return true;
+        if (!person.course) return true;
+        if (!person.department) return true;
         if (errorMessages.length) return true;
 
         return false;
@@ -72,14 +75,22 @@ const App = React.createClass({
                         validate={(val) => (isEmail(val) ? false : 'Invalid Email')}
                     />
 
+                    <br />
+
+                    <CourseSelect
+                        department={this.state.fields.department}
+                        course={this.state.fields.course}
+                        onChange={this.onInputChange}
+                    />
+
                     <input type='submit' disabled={this.validate()} />
                 </form>
 
                 <div>
                     <h3>Names</h3>
                     <ul>
-                        { this.state.people.map(({ name, email }, i) =>
-                            <li key={i}>{name} ({ email })</li>
+                        { this.state.people.map(({ name, email, department, course }, i) =>
+                            <li key={i}>{[ name, email, department, course].join(' - ')}</li>
                         ) }
                     </ul>
                 </div>
