@@ -9,19 +9,39 @@ const App = React.createClass({
             fields: {},
             fieldErrors: {},
             people: [],
+            _loading: false,
+            _saveStatus: 'READY',
         };
     },
 
+    componentWillMount() {
+        this.setState({ _loading: true });
+        apiClient.loadPeople().then((people) => {
+            this.setState({ _loading: false, people: people });
+        });
+    },
+
     onFormSubmit(e) {
-        const people = this.state.people;
         const person = this.state.fields;
+        const people = [ ...this.state.people, person ];
 
         e.preventDefault();
 
         if (this.validate()) return;
 
-        people.push(person);
-        this.setState({ people, fields: {} });
+        this.setState({ _saveStatus: 'SAVING' });
+        apiClient.savePeople(people)
+            .then(() => {
+                this.setState({
+                    people: people,
+                    fields: {},
+                    _saveStatus: 'SUCCESS',
+                });
+            })
+            .catch((err) => {
+                console.error(err);
+                this.setState({ _saveStatus: 'ERROR'})
+            });
     },
 
     onInputChange({ name, value, error }) {
@@ -31,7 +51,7 @@ const App = React.createClass({
         fields[name] = value;
         fieldErrors[name] = error;
 
-        this.setState({ fields, fieldErrors });
+        this.setState({ fields, fieldErrors, _saveStatus: 'READY' });
     },
 
     validate() {
@@ -50,6 +70,10 @@ const App = React.createClass({
     },
 
     render: function() {
+        if (this.state._loading) {
+            return <img alt='loading' src='/img/loading.gif' />
+        }
+
         return (
             <div>
                 <h1>Sign Up</h1>
@@ -83,7 +107,23 @@ const App = React.createClass({
                         onChange={this.onInputChange}
                     />
 
-                    <input type='submit' disabled={this.validate()} />
+                    <br />
+
+                    {{
+                        SAVING: <input value='Saving...' type='submit' disabled />,
+                        SUCCESS: <input value='Saved!' type='submit' disabled />,
+                        ERROR: <input
+                                value='Save Failed - Retry?'
+                                type='submit'
+                                disabled={this.validate()}
+                               />,
+                        READY: <input
+                                value='Submit'
+                                type='submit'
+                                disabled={this.validate()}
+                               />,
+                    }[this.state._saveStatus]}
+
                 </form>
 
                 <div>
@@ -98,5 +138,33 @@ const App = React.createClass({
         );
     },
 });
+
+const apiClient = {
+    loadPeople: function() {
+        return {
+            then: function(cb) {
+                setTimeout(() => {
+                    cb(JSON.parse(localStorage.people || '[]'));
+                }, 1000);
+            },
+        };
+    },
+
+    savePeople: function(people) {
+        // Simulate Errors
+        const success = !!(this.count++ % 2);
+
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if(!success) return reject({ success });
+
+                localStorage.people = JSON.stringify(people);
+                return resolve({ success });
+            }, 1000);
+        });
+    },
+
+    count: 1
+};
 
 export default App;
