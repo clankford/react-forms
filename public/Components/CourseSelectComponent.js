@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
-import Core from './core.json';
-import Electives from './electives.json'
+import Core from '../core.json';
+import Electives from '../electives.json'
 
 const Courses = {
     core: Core,
