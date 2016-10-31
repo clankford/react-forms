@@ -1,48 +1,36 @@
 import React from 'react';
 import isEmail from 'validator/lib/isEmail';
-import Field from './Components/FieldComponent';
-import CourseSelect from './Components/CourseSelectComponent';
-import apiClient from './apiClient';
+import Field from './FieldComponent';
+import CourseSelect from './CourseSelectComponent';
 
-const App = React.createClass({
+const Form = React.createClass({
+    propTypes: {
+        people: propTypes.array.isRequired,
+        isLoading: PropTypes.bool.isRequred,
+        saveStatus: PropTypes.string.isRequred,
+        fields: PropTypes.object,
+        onSubmit: PropTypes.func.isRequred,
+    },
+
     getInitialState() {
         return {
-            fields: {},
+            fields: this.props.fields || {},
             fieldErrors: {},
-            people: [],
-            _loading: false,
-            _saveStatus: 'READY',
         };
     },
 
-    componentWillMount() {
-        this.setState({ _loading: true });
-        apiClient.loadPeople().then((people) => {
-            this.setState({ _loading: false, people: people });
-        });
+    componentWillReceiveProps(update) {
+        this.setState({ fields: update.fields });
     },
 
     onFormSubmit(e) {
         const person = this.state.fields;
-        const people = [ ...this.state.people, person ];
 
         e.preventDefault();
 
         if (this.validate()) return;
 
-        this.setState({ _saveStatus: 'SAVING' });
-        apiClient.savePeople(people)
-            .then(() => {
-                this.setState({
-                    people: people,
-                    fields: {},
-                    _saveStatus: 'SUCCESS',
-                });
-            })
-            .catch((err) => {
-                console.error(err);
-                this.setState({ _saveStatus: 'ERROR'})
-            });
+        this.props.onSubmit([ ...this.props.people, person ]);
     },
 
     onInputChange({ name, value, error }) {
@@ -71,9 +59,13 @@ const App = React.createClass({
     },
 
     render: function() {
-        if (this.state._loading) {
+        if (this.props.isLoading) {
             return <img alt='loading' src='/img/loading.gif' />
         }
+
+        const dirty = Object.keys(this.state.fields).length;
+        let status = this.props.saveStatus;
+        if (status === 'SUCCESS' && dirty) status = 'READY';
 
         return (
             <div>
@@ -123,14 +115,14 @@ const App = React.createClass({
                                 type='submit'
                                 disabled={this.validate()}
                                />,
-                    }[this.state._saveStatus]}
+                    }[status]}
 
                 </form>
 
                 <div>
                     <h3>Names</h3>
                     <ul>
-                        { this.state.people.map(({ name, email, department, course }, i) =>
+                        { this.props.people.map(({ name, email, department, course }, i) =>
                             <li key={i}>{[ name, email, department, course].join(' - ')}</li>
                         ) }
                     </ul>
@@ -140,4 +132,4 @@ const App = React.createClass({
     },
 });
 
-export default App;
+export default Form;
